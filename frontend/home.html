@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Welcome to Our Store</h2>
+    <div id="productList"></div>
+    <script>
+        async function fetchProducts() {
+            let response = await fetch('/api/products');
+            let products = await response.json();
+            let productList = document.getElementById("productList");
+            products.forEach(product => {
+                let div = document.createElement("div");
+                div.classList.add("product");
+                div.innerHTML = `<h3>${product.product_category_name}</h3>
+                                <p>Price: $${product.price}</p>
+                                <button onclick="purchase('${product.product_id}')">Buy Now</button>`;
+                productList.appendChild(div);
+            });
+        }
+        async function purchase(productId) {
+            let customer_id = localStorage.getItem("customer_id");
+            let response = await fetch('/api/purchase', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ product_id: productId, customer_id: customer_id })
+            });
+            let data = await response.json();
+            alert(data.message);
+        }
+        fetchProducts();
+    </script>
+</body>
+</html>
