@@ -1,0 +1,12 @@
+/* <!-- styles.css --> */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.product {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+}

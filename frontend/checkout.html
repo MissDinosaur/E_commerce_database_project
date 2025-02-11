@@ -1,0 +1,24 @@
+<!-- checkout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Checkout</h2>
+    <p>Completing your purchase...</p>
+    <script>
+        document.addEventListener("mousemove", async function(event) {
+            let customer_id = localStorage.getItem("customer_id");
+            await fetch('/api/log_cursor', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ x: event.clientX, y: event.clientY, customer_id: customer_id })
+            });
+        });
+    </script>
+</body>
+</html>
