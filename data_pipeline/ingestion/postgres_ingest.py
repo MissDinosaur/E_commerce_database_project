@@ -13,19 +13,19 @@ sqlite_connector = sqlite3.connect(SQLITE_DB_PATH)
 # Connect to PostgreSQL
 pg_engine = create_engine(POSTGRES_URL)
 
-# Tables to store in PostgreSQL
-pg_tables = ["customers", "leads_closed", "leads_qualified", "order_items", 
-             "order_payments", "orders", "product_category_name_translation", "sellers"]
+# Fetch all tables from SQLite
+query = "SELECT name FROM sqlite_master WHERE type='table';"
+tables = pd.read_sql(query, sqlite_connector)["name"].tolist()
 
-for table in pg_tables:
+# Store all tables in PostgreSQL
+for table in tables:
     try:
         df = pd.read_sql(sql=f"SELECT * FROM {table}", con=sqlite_connector)
-        df.to_sql(table, pg_engine, if_exists="append", index=False)
+        df.to_sql(table, pg_engine, if_exists="replace", index=False)
         print(f"{table} stored in PostgreSQL.")
     except Exception as e:
         print(f"Error storing {table} in PostgreSQL: {e}")
 
 # Close connections
 sqlite_connector.close()
-
-print("🎯 Data migration to PostgreSQL completed successfully!")
+print("📌 All tables migrated to PostgreSQL successfully!")
