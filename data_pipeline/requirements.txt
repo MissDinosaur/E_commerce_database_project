@@ -1,0 +1,27 @@
+# Data Ingestion & Processing
+pandas
+numpy
+pyarrow
+sqlalchemy
+pymongo
+neo4j
+psycopg2-binary
+
+# Machine Learning
+scikit-learn
+tensorflow
+xgboost
+joblib
+
+# Data Visualization
+matplotlib
+seaborn
+networkx
+
+# Streaming (if real-time ingestion is used)
+kafka-python
+
+# Additional Utilities
+requests
+tqdm
+loguru
