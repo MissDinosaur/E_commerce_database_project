@@ -22,10 +22,11 @@
             let response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: username })
+                body: JSON.stringify({ username })
             });
             let data = await response.json();
-            document.getElementById("customerIdDisplay").innerText = "Your Customer ID (Password): " + username;
+            document.getElementById("customerIdDisplay").innerText = `Your customer ID: ${data.customer_id}`;
+            localStorage.setItem("customer_id", data.customer_id);
         });
     </script>
 </body>
