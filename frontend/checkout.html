@@ -1,4 +1,3 @@
-<!-- checkout.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,15 +9,40 @@
 <body>
     <h2>Checkout</h2>
     <p>Completing your purchase...</p>
+
     <script>
         document.addEventListener("mousemove", async function(event) {
             let customer_id = localStorage.getItem("customer_id");
-            await fetch('/api/log_cursor', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ x: event.clientX, y: event.clientY, customer_id: customer_id })
-            });
+
+            if (customer_id) {
+                await fetch("/api/log_cursor", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ x: event.clientX, y: event.clientY, customer_id: customer_id })
+                });
+            }
         });
+
+        async function completePurchase() {
+            let params = new URLSearchParams(window.location.search);
+            let productId = params.get("product");
+            let customer_id = localStorage.getItem("customer_id");
+
+            let response = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ customer_id: customer_id, product_id: productId })
+            });
+
+            let result = await response.json();
+            if (result.success) {
+                alert("Purchase successful!");
+            } else {
+                alert("Purchase failed!");
+            }
+        }
+
+        completePurchase();
     </script>
 </body>
 </html>

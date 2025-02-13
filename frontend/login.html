@@ -21,14 +21,14 @@
             let response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ customer_id: username })
+                body: JSON.stringify({ username })
             });
             let data = await response.json();
             if (data.success) {
-                localStorage.setItem("customer_id", username);
+                localStorage.setItem("customer_id", data.customer_id);
                 window.location.href = "home.html";
             } else {
-                alert("Invalid Login");
+                alert("Invalid username");
             }
         });
     </script>
