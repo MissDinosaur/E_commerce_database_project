@@ -27,21 +27,28 @@
             let params = new URLSearchParams(window.location.search);
             let productId = params.get("product");
             let customer_id = localStorage.getItem("customer_id");
-
-            let response = await fetch("/api/checkout", {
+    
+            let response = await fetch("/api/checkout", {  // Checkout API
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ customer_id: customer_id, product_id: productId })
             });
-
+    
             let result = await response.json();
             if (result.success) {
                 alert("Purchase successful!");
+                runFraudCheck();  // Trigger Fraud Detection
             } else {
                 alert("Purchase failed!");
             }
         }
-
+    
+        async function runFraudCheck() {
+            let response = await fetch("/api/fraud_detection");  // Fraud API
+            let result = await response.json();
+            console.log("Fraud Check Result:", result);
+        }
+    
         completePurchase();
     </script>
 </body>

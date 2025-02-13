@@ -1,3 +1,6 @@
 fastapi
-pydantic
 uvicorn
+sqlalchemy
+psycopg2-binary
+pymongo
+neo4j
