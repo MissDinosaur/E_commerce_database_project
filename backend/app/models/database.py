@@ -4,7 +4,7 @@ import pymongo
 from neo4j import GraphDatabase
 
 # PostgreSQL Connection
-DATABASE_URL = "postgresql://postgres:yourpassword@postgres_db/ecommerce_db"
+DATABASE_URL = "postgresql://postgres:yourpassword@postgres_db/ecommerce"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

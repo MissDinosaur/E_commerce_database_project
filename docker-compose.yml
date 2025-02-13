@@ -1,34 +1,16 @@
 version: '3.8'
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    ports:
-      - "8000:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
-    volumes:
-      - ./backend:/app
-    command: python app/main.py
-    depends_on:
-      - postgres_db
-      - mongo_db
-      - neo4j_db
-    networks:
-      - app_network
-
+  # 1️⃣ Start PostgreSQL
   postgres_db:
     build:
       context: ./databases/postgres
       dockerfile: Dockerfile
-    container_name: postgres_db
+    container_name: postgres
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=fraud_detection
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=ecommerce
     ports:
       - "5432:5432"
     volumes:
@@ -37,6 +19,7 @@ services:
     networks:
       - app_network
 
+  # 2️⃣ Start MongoDB
   mongo_db:
     build:
       context: ./databases/mongo
@@ -50,6 +33,7 @@ services:
     networks:
       - app_network
 
+  # 3️⃣ Start Neo4j
   neo4j_db:
     build:
       context: ./databases/neo4j
@@ -66,16 +50,61 @@ services:
     networks:
       - app_network
 
-  data_pipeline:
+  # 4️⃣ Run Data Ingestion (after databases are up)
+  data_ingestion:
     build:
       context: ./data_pipeline
       dockerfile: Dockerfile
-    container_name: data_pipeline
+    container_name: data_ingestion
     volumes:
-      - ./data_pipeline:/data_pipeline
+      - ./data_pipeline:/app
+      - ./data_pipeline/data/olist.sqlite:/app/data/olist.sqlite
+    command: >
+      sh -c "sleep 10 &&
+           python ingestion/postgres_ingest.py &&
+           python ingestion/mongo_ingest.py &&
+           python ingestion/neo4j_ingest.py"
+    depends_on:
+      - postgres_db
+      - mongo_db
+      - neo4j_db
     networks:
       - app_network
 
+  # 5️⃣ Train ML Model (after data ingestion is complete)
+  model_training:
+    build:
+      context: ./data_pipeline
+      dockerfile: Dockerfile
+    container_name: model_training
+    volumes:
+      - ./data_pipeline:/app
+    command: python ml/train_model.py
+    depends_on:
+      - data_ingestion
+    networks:
+      - app_network
+
+  # 6️⃣ Start Backend (after model training is done)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+      - ./data_pipeline/ml/fraud_model.pkl:/app/ml/fraud_model.pkl  # ✅ Mount trained model
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+    depends_on:
+      - model_training  # ✅ Backend waits for training
+    networks:
+      - app_network
+
+  # 7️⃣ Frontend (Optional)
   frontend:
     container_name: frontend
     image: nginx:alpine
@@ -86,6 +115,7 @@ services:
     networks:
       - app_network
 
+  # 8️⃣ Logging Service
   logs:
     container_name: logs
     image: python:3.11
@@ -94,6 +124,7 @@ services:
     networks:
       - app_network
 
+  # 9️⃣ Scripts Container
   scripts:
     container_name: scripts
     image: python:3.11
@@ -102,6 +133,7 @@ services:
     networks:
       - app_network
 
+  # 🔟 Testing Container
   tests:
     container_name: tests
     image: python:3.11
@@ -110,6 +142,7 @@ services:
     networks:
       - app_network
 
+  # 1️⃣1️⃣ Temporary Storage
   tmp:
     container_name: tmp
     image: python:3.11
@@ -118,6 +151,7 @@ services:
     networks:
       - app_network
 
+# 🔄 Persistent Storage Volumes
 volumes:
   backend_data:
   postgres_data:
@@ -130,7 +164,7 @@ volumes:
   tests_data:
   tmp_data:
 
+# 🔗 Network Configuration
 networks:
   app_network:
     driver: bridge
-

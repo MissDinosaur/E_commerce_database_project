@@ -9,7 +9,7 @@ from neo4j import GraphDatabase
 model = joblib.load("app/ml/fraud_model.pkl")
 
 # Connect to PostgreSQL
-POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce_db"
+POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce"
 pg_engine = create_engine(POSTGRES_URL)
 
 # Connect to MongoDB

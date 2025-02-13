@@ -4,3 +4,5 @@ sqlalchemy
 psycopg2-binary
 pymongo
 neo4j
+joblib
+pandas
