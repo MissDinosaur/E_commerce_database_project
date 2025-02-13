@@ -5,51 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        async function handleCheckout(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const customerId = document.getElementById("customer_id").value;
+            const productId = document.getElementById("product_id").value;
+            const orderId = "ORD-" + Math.floor(Math.random() * 100000); // Generate random order ID
+
+            const response = await fetch("/api/checkout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ customer_id: customerId, product_id: productId, order_id: orderId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById("message").innerHTML = `
+                    <p class="success">✅ Purchase successful! (Fraud Score: ${result.fraud_score.toFixed(2)})</p>
+                `;
+            } else {
+                document.getElementById("message").innerHTML = `
+                    <p class="warning">⚠️ Transaction logged but marked as fraud! (Fraud Score: ${result.fraud_score.toFixed(2)})</p>
+                `;
+            }
+        }
+    </script>
 </head>
 <body>
-    <h2>Checkout</h2>
-    <p>Completing your purchase...</p>
+    <div class="checkout-container">
+        <h1>Checkout</h1>
+        <form onsubmit="handleCheckout(event)">
+            <label for="customer_id">Customer ID:</label>
+            <input type="text" id="customer_id" required>
 
-    <script>
-        document.addEventListener("mousemove", async function(event) {
-            let customer_id = localStorage.getItem("customer_id");
+            <label for="product_id">Product ID:</label>
+            <input type="text" id="product_id" required>
 
-            if (customer_id) {
-                await fetch("/api/log_cursor", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ x: event.clientX, y: event.clientY, customer_id: customer_id })
-                });
-            }
-        });
-
-        async function completePurchase() {
-            let params = new URLSearchParams(window.location.search);
-            let productId = params.get("product");
-            let customer_id = localStorage.getItem("customer_id");
-    
-            let response = await fetch("/api/checkout", {  // Checkout API
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ customer_id: customer_id, product_id: productId })
-            });
-    
-            let result = await response.json();
-            if (result.success) {
-                alert("Purchase successful!");
-                runFraudCheck();  // Trigger Fraud Detection
-            } else {
-                alert("Purchase failed!");
-            }
-        }
-    
-        async function runFraudCheck() {
-            let response = await fetch("/api/fraud_detection");  // Fraud API
-            let result = await response.json();
-            console.log("Fraud Check Result:", result);
-        }
-    
-        completePurchase();
-    </script>
+            <button type="submit">Complete Purchase</button>
+        </form>
+        <div id="message"></div>
+    </div>
 </body>
 </html>
