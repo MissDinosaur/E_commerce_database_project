@@ -4,7 +4,7 @@ import uvicorn
 
 app = FastAPI(title="Fraud Detection API")
 
-# Include all routes
+# Include API routes
 app.include_router(auth.router, prefix="/api")
 app.include_router(products.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
