@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+    command: python app/main.py
+    depends_on:
+      - postgres_db
+      - mongo_db
+      - neo4j_db
+    networks:
+      - app_network
+
+  postgres_db:
+    build:
+      context: ./databases/postgres
+      dockerfile: Dockerfile
+    container_name: postgres_db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=fraud_detection
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./databases/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app_network
+
+  mongo_db:
+    build:
+      context: ./databases/mongo
+      dockerfile: Dockerfile
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./databases/mongo/init.js:/docker-entrypoint-initdb.d/init.js
+    networks:
+      - app_network
+
+  neo4j_db:
+    build:
+      context: ./databases/neo4j
+      dockerfile: Dockerfile
+    container_name: neo4j_db
+    environment:
+      - NEO4J_AUTH=neo4j/password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+      - ./databases/neo4j/init.cypher:/var/lib/neo4j/import/init.cypher
+    networks:
+      - app_network
+
+  data_pipeline:
+    build:
+      context: ./data_pipeline
+      dockerfile: Dockerfile
+    container_name: data_pipeline
+    volumes:
+      - ./data_pipeline:/data_pipeline
+    networks:
+      - app_network
+
+  frontend:
+    container_name: frontend
+    image: nginx:alpine
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    ports:
+      - "80:80"
+    networks:
+      - app_network
+
+  logs:
+    container_name: logs
+    image: python:3.11
+    volumes:
+      - ./logs:/logs
+    networks:
+      - app_network
+
+  scripts:
+    container_name: scripts
+    image: python:3.11
+    volumes:
+      - ./scripts:/scripts
+    networks:
+      - app_network
+
+  tests:
+    container_name: tests
+    image: python:3.11
+    volumes:
+      - ./tests:/tests
+    networks:
+      - app_network
+
+  tmp:
+    container_name: tmp
+    image: python:3.11
+    volumes:
+      - ./tmp:/tmp
+    networks:
+      - app_network
+
+volumes:
+  backend_data:
+  postgres_data:
+  mongo_data:
+  neo4j_data:
+  data_pipeline_data:
+  frontend_data:
+  logs_data:
+  scripts_data:
+  tests_data:
+  tmp_data:
+
+networks:
+  app_network:
+    driver: bridge
+
