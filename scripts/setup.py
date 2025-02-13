@@ -5,7 +5,7 @@ print("🚀 Running setup script...")
 
 # 1️⃣ Setup PostgreSQL (Run init.sql)
 print("📌 Setting up PostgreSQL...")
-subprocess.run(["psql", "-h", "postgres_db", "-U", "postgres", "-d", "ecommerce_db", "-f", "databases/postgres/init.sql"])
+subprocess.run(["psql", "-h", "postgres_db", "-U", "postgres", "-d", "ecommerce", "-f", "databases/postgres/init.sql"])
 
 # 2️⃣ Setup MongoDB (Run init.js)
 print("📌 Setting up MongoDB...")

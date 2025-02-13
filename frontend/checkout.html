@@ -33,6 +33,43 @@
                 `;
             }
         }
+        let eventLogs = [];  // Store logs in memory
+    const LOG_BATCH_SIZE = 10;  // Adjust based on need
+
+    function logEvent(eventType, data) {
+        eventLogs.push({ event: eventType, ...data, timestamp: new Date().toISOString() });
+
+        // Send logs in batches
+        if (eventLogs.length >= LOG_BATCH_SIZE) {
+            sendLogs();
+        }
+    }
+
+    function sendLogs() {
+        if (eventLogs.length === 0) return; // Nothing to send
+
+        fetch("/api/logs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(eventLogs)
+        }).then(() => {
+            eventLogs = [];  // Clear sent logs
+        }).catch(err => console.error("Log Error:", err));
+    }
+
+    document.addEventListener("mousemove", (event) => {
+        logEvent("mousemove", { x: event.clientX, y: event.clientY });
+    });
+
+    document.addEventListener("click", (event) => {
+        logEvent("click", { x: event.clientX, y: event.clientY, target: event.target.tagName });
+    });
+
+    document.addEventListener("scroll", () => {
+        logEvent("scroll", { scrollY: window.scrollY });
+    });
+
+    window.addEventListener("beforeunload", sendLogs); // Ensure logs are sent before page exit
     </script>
 </head>
 <body>

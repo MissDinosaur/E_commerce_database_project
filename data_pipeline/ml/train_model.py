@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
 # Connect to PostgreSQL
-POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce_db"
+POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce"
 pg_engine = create_engine(POSTGRES_URL)
 
 # Fetch Transactions from PostgreSQL

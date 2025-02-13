@@ -1,7 +1,7 @@
 import psycopg2
 
 # Connect to PostgreSQL
-conn = psycopg2.connect("dbname=ecommerce_db user=postgres password=password host=postgres_db")
+conn = psycopg2.connect("dbname=ecommerce user=postgres password=password host=postgres_db")
 cur = conn.cursor()
 
 # Function to store fraud alerts in PostgreSQL

@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # 📌 Connect to PostgreSQL
-POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce_db"
+POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce"
 pg_engine = create_engine(POSTGRES_URL)
 
 # 📌 Load Transactions
