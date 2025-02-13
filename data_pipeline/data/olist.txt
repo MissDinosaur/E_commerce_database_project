@@ -1,0 +1,2 @@
+download the data from this link and keep it here
+www.kaggle.com/datasets/terencicp/e-commerce-dataset-by-olist-as-an-sqlite-database/

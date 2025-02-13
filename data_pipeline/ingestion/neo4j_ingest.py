@@ -12,30 +12,34 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "password")
 # Connect to SQLite
 sqlite_connector = sqlite3.connect(SQLITE_DB_PATH)
 
-# Load data from SQLite
-neo4j_table = "order_payments"
-df = pd.read_sql(sql=f"SELECT * FROM {neo4j_table}", con=sqlite_connector)
-df_list = df.values.tolist()
+# Load fraud-labeled customer data
+cursor_logs_df = pd.read_sql("SELECT customer_id, fraud_label FROM cursor_logs", con=sqlite_connector)
+
+df_list = cursor_logs_df.values.tolist()
 
 # Connect to Neo4j
 neo4j_driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
 
-def insert_into_neo4j(tx, data):
-    tx.run("""
-        MERGE (o:Order {order_id: $order_id})
-        SET o.payment_sequential = $payment_sequential,
-            o.payment_type = $payment_type,
-            o.payment_installments = $payment_installments,
-            o.payment_value = $payment_value
-    """, order_id=data[0], payment_sequential=data[1], payment_type=data[2], 
-         payment_installments=data[3], payment_value=data[4])
+def insert_fraud_relationship(tx, data):
+    customer_id, fraud_label = data
+
+    if fraud_label == 1:
+        tx.run("""
+            MERGE (c:Customer {customer_id: $customer_id})
+            SET c.fraud_risk = 'HIGH'
+        """, customer_id=customer_id)
+    else:
+        tx.run("""
+            MERGE (c:Customer {customer_id: $customer_id})
+            SET c.fraud_risk = 'LOW'
+        """, customer_id=customer_id)
 
 # Execute insertions
 with neo4j_driver.session() as session:
     for record in df_list:
-        session.write_transaction(insert_into_neo4j, record)
+        session.write_transaction(insert_fraud_relationship, record)
 
-print("order_payments data stored in Neo4j.")
+print("📌 Customer fraud risk stored in Neo4j.")
 
 # Close connections
 sqlite_connector.close()
