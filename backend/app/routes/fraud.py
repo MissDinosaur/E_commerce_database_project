@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.models.database import neo4j_driver, get_db, mongo_db
+from app.models.database import neo4j_driver, get_db
 from app.ml.fraud_detection import predict_fraud
 
 router = APIRouter()
@@ -18,19 +18,23 @@ def detect_fraud():
         """, customer_id=fraud_result["customer_id"])
         fraud_network_size = result.single()["order_count"] if result.single() else 0
 
-    # 3️⃣ Combine Neo4j Graph Analysis & ML Model
-    final_risk_level = "HIGH" if fraud_result["fraud_score"] > 0.7 or fraud_network_size > 5 else "LOW"
+    # 3️⃣ Determine Fraud Alert Flag (High-Risk Transactions)
+    fraud_threshold = 0.7
+    alert_flag = fraud_result["fraud_score"] > fraud_threshold or fraud_network_size > 5
 
-    # 4️⃣ Log High-Risk Transactions for Manual Review (Optional)
-    if final_risk_level == "HIGH":
-        db = next(get_db())
-        db.execute("INSERT INTO fraud_alerts (customer_id, fraud_score, risk_level) VALUES (%s, %s, %s)",
-                   (fraud_result["customer_id"], fraud_result["fraud_score"], final_risk_level))
-        db.commit()
+    # 4️⃣ Store Fraud Alert in PostgreSQL
+    db = next(get_db())
+    db.execute("""
+        INSERT INTO fraud_alerts (order_id, customer_id, fraud_score, alert_flag)
+        VALUES (%s, %s, %s, %s)
+    """, (fraud_result["order_id"], fraud_result["customer_id"], fraud_result["fraud_score"], alert_flag))
+    db.commit()
 
     return {
         "customer_id": fraud_result["customer_id"],
+        "order_id": fraud_result["order_id"],
         "fraud_score": fraud_result["fraud_score"],
         "fraud_network_size": fraud_network_size,
-        "risk_level": final_risk_level
+        "alert_flag": alert_flag,
+        "risk_level": "HIGH" if alert_flag else "LOW"
     }
