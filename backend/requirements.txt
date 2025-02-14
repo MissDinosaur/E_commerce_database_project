@@ -1,8 +1,8 @@
-fastapi
-uvicorn
-sqlalchemy==2.0.38
-psycopg2-binary
-pymongo
-neo4j
-joblib
-pandas
+fastapi==0.115.8
+uvicorn==0.34.0
+sqlalchemy==2.0.37
+psycopg2-binary==2.9.10
+pymongo==4.11.1
+neo4j==5.28.1
+joblib==1.4.2
+pandas==2.2.3
