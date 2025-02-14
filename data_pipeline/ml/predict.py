@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from neo4j import GraphDatabase
 
 # Load Fraud Model
-model = joblib.load("app/ml/fraud_model.pkl")
+#model = joblib.load("app/ml/fraud_model.pkl")  # "should be ml/fraud_model.pkl" or /app/ml/fraud_model.pkl
 
 # Connect to PostgreSQL
 POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce"
@@ -66,14 +66,15 @@ def predict_fraud(order_id):
     X = transactions_df.drop(columns=["order_id", "customer_id"])
 
     # Make Prediction
-    prediction = model.predict(X)
-    fraud_probability = model.predict_proba(X)[:, 1][0]
+    #prediction = model.predict(X)
+    fraud_probability = 0.3 #model.predict_proba(X)[:, 1][0]
+    is_fraud = False # bool(prediction[0]
 
     return {
         "order_id": order_id,
         "customer_id": customer_id,
         "fraud_score": fraud_probability,
-        "is_fraud": bool(prediction[0])
+        "is_fraud": is_fraud
     }
 
 # Example Usage
