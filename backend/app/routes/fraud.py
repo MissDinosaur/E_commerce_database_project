@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.models.database import neo4j_driver, get_db
-from app.ml.predict import predict_fraud  # Import fraud prediction function
+from predict import predict_fraud  # Import fraud prediction function
 
 router = APIRouter()
 
@@ -31,11 +31,14 @@ def detect_fraud(order_id: str):
 
     # Store Fraud Alert in PostgreSQL
     db = next(get_db())
-    db.execute("""
-        INSERT INTO fraud_alerts (order_id, customer_id, fraud_score, alert_flag)
-        VALUES (%s, %s, %s, %s)
-    """, (order_id, customer_id, fraud_score, alert_flag))
-    db.commit()
+    try:
+        db.execute("""
+            INSERT INTO fraud_alerts (order_id, customer_id, fraud_score, alert_flag)
+            VALUES (%s, %s, %s, %s)
+        """, (order_id, customer_id, fraud_score, alert_flag))
+        db.commit()
+    except Exception as e:
+        print(f"Error executing query for fraud_alerts in PostgreSQL: {e}")
 
     # Return Fraud Status
     return {

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.models.database import get_db, mongo_db
-from data_pipeline.ml.predict import predict_fraud
+from predict import predict_fraud
 from datetime import datetime
 
 router = APIRouter()
