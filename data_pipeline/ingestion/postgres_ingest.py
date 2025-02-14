@@ -17,14 +17,22 @@ pg_engine = create_engine(POSTGRES_URL)
 query = "SELECT name FROM sqlite_master WHERE type='table';"
 tables = pd.read_sql(query, sqlite_connector)["name"].tolist()
 
-# Store all tables in PostgreSQL
-for table in tables:
+table_order = ["customers", "orders", "order_items", "order_payments", "order_reviews", "fraud_alerts"]
+
+for table in table_order:
     try:
         df = pd.read_sql(sql=f"SELECT * FROM {table}", con=sqlite_connector)
-        df.to_sql(table, pg_engine, if_exists="replace", index=False)
+
+        # Prevent duplicate entry errors
+        if table == "orders":
+            df.to_sql(table, pg_engine, if_exists="replace", index=False)
+        else:
+            df.to_sql(table, pg_engine, if_exists="append", index=False)
+
         print(f"{table} stored in PostgreSQL.")
     except Exception as e:
         print(f"Error storing {table} in PostgreSQL: {e}")
+
 
 # Close connections
 sqlite_connector.close()
