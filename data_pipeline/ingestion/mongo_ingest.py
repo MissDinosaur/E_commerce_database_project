@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 # Load environment variables
 MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
 MONGO_PORT = int(os.getenv("MONGO_PORT", "27017"))
-SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "../data/olist.sqlite")
+SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "/app/data/olist.sqlite")    #"../data/olist.sqlite"
 
 # Connect to SQLite
 sqlite_connector = sqlite3.connect(SQLITE_DB_PATH)
@@ -27,8 +27,8 @@ table_exists = cursor.fetchone()
 if not table_exists:
     raise Exception("⚠️ Error: Table 'orders' does not exist in SQLite!")
 
-# 1️⃣ Generate Cursor Log Data (80% Normal, 20% Fraud)
-orders_df = pd.read_sql("SELECT DISTINCT customer_id FROM orders", con=sqlite_connector)
+# 1️⃣ Generate Cursor Log Data (80% Normal, 20% Fraud)  # count: 12392782, LIMIT 100000
+orders_df = pd.read_sql("SELECT DISTINCT customer_id FROM orders LIMIT 100000", con=sqlite_connector)
 
 cursor_logs = []
 batch_size = 5000  # Store logs in batches
@@ -67,7 +67,7 @@ for _, row in orders_df.iterrows():
             "timestamp": timestamp.isoformat(),
             "cursor_speed": speed,
             "click_intensity": click_intensity,
-            "fraud_label": is_fraud
+            "fraud_label": int(is_fraud)
         })
 
     # Batch insert to MongoDB for performance

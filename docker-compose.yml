@@ -98,6 +98,7 @@ services:
     volumes:
       - ./backend:/app
       - ./data_pipeline/ml/fraud_model.pkl:/app/ml/fraud_model.pkl  # ✅ Mount trained model
+      - ./data_pipeline/ml/predict.py:/app/predict.py  # ✅ Mount predict.py
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     depends_on:
       - model_training  # ✅ Backend waits for training

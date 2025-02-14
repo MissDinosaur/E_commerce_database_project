@@ -98,7 +98,8 @@ CREATE TABLE IF NOT EXISTS products (
     product_weight_g FLOAT,
     product_length_cm FLOAT,
     product_height_cm FLOAT,
-    product_width_cm FLOAT
+    product_width_cm FLOAT,
+    price FLOAT
 );
 
 -- Sellers Table
