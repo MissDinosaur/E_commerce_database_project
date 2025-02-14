@@ -32,6 +32,7 @@ for table in tables:
     except Exception as e:
         print(f"Error storing {table} in PostgreSQL: {e}")
 
+
 # Close connections
 sqlite_connector.close()
 print("📌 All tables migrated to PostgreSQL successfully!")
