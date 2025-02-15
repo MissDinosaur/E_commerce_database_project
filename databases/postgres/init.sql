@@ -26,8 +26,12 @@ CREATE TABLE IF NOT EXISTS leads_closed (
     business_segment TEXT,
     lead_type TEXT,
     lead_behaviour_profile TEXT,
-    has_company BOOLEAN,
-    has_gtin BOOLEAN
+    has_company INT,
+    has_gtin INT,
+    average_stock TEXT, 
+    business_type TEXT, 
+    declared_product_catalog_size INT, 
+    declared_monthly_revenue INT
 );
 
 -- Leads Qualified Table
@@ -48,6 +52,27 @@ CREATE TABLE IF NOT EXISTS orders (
     order_delivered_carrier_date TIMESTAMP,
     order_delivered_customer_date TIMESTAMP,
     order_estimated_delivery_date TIMESTAMP
+);
+
+-- Products Table
+CREATE TABLE IF NOT EXISTS products (
+    product_id TEXT PRIMARY KEY,
+    product_category_name TEXT,
+    product_name_lenght INT,
+    product_description_lenght INT,
+    product_photos_qty INT,
+    product_weight_g FLOAT,
+    product_length_cm FLOAT,
+    product_height_cm FLOAT,
+    product_width_cm FLOAT
+);
+
+-- Sellers Table
+CREATE TABLE IF NOT EXISTS sellers (
+    seller_id TEXT PRIMARY KEY,
+    seller_zip_code_prefix TEXT,
+    seller_city TEXT,
+    seller_state TEXT
 );
 
 -- Order Items Table
@@ -86,27 +111,6 @@ CREATE TABLE IF NOT EXISTS order_reviews (
 CREATE TABLE IF NOT EXISTS product_category_name_translation (
     product_category_name TEXT PRIMARY KEY,
     product_category_name_english TEXT
-);
-
--- Products Table
-CREATE TABLE IF NOT EXISTS products (
-    product_id TEXT PRIMARY KEY,
-    product_category_name TEXT,
-    product_name_lenght INT,
-    product_description_lenght INT,
-    product_photos_qty INT,
-    product_weight_g FLOAT,
-    product_length_cm FLOAT,
-    product_height_cm FLOAT,
-    product_width_cm FLOAT
-);
-
--- Sellers Table
-CREATE TABLE IF NOT EXISTS sellers (
-    seller_id TEXT PRIMARY KEY,
-    seller_zip_code_prefix TEXT,
-    seller_city TEXT,
-    seller_state TEXT
 );
 
 -- ✅ Fraud Alerts Table (Extra Table for Fraud Detection)
