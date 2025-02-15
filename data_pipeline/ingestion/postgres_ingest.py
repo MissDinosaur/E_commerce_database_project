@@ -16,6 +16,7 @@ pg_engine = create_engine(POSTGRES_URL)
 query = "SELECT name FROM sqlite_master WHERE type='table';"
 tables = pd.read_sql(query, sqlite_connector)["name"].tolist()
 #table_order = ["customers", "orders", "order_items", "order_payments", "order_reviews", "fraud_alerts"]
+
 LIMIT_NUM = 100000
 
 # Store all tables in PostgreSQL
@@ -23,7 +24,7 @@ for table in tables:
     try:
         df = pd.read_sql(f"SELECT * FROM {table} LIMIT {LIMIT_NUM}", con=sqlite_connector)
         with pg_engine.connect() as conn:
-            # empty table before insert data 
+            # empty table but not destroy the table structure before insert data 
             conn.execute(text(f"DELETE FROM {table};"))
             conn.commit()
 

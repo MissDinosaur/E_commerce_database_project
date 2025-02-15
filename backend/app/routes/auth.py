@@ -16,9 +16,10 @@ def register_user(request: RegisterRequest):
     customers = Table('customers', metadata, autoload_with=postgres_engine)
     with postgres_engine.connect() as conn:
         stmt = select(customers).where(customers.c.customer_id == request.customer_id)
-        result = conn.execute(stmt).fetchone()
+        # validate whether request.customer_id already exists in the table.
+        result = conn.execute(stmt).fetchone()  
 
-        if result is not None:
+        if result is not None: # if request.customer_id already exists in the table then skip storing
             print(f"customer_id: {request.customer_id} already exists and will not be inserted")
         else:
             insert_stmt = customers.insert().values(customer_id=request.customer_id, customer_unique_id=request.username)
