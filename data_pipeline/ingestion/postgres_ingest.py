@@ -1,7 +1,11 @@
 import os
 import sqlite3
 import pandas as pd
+<<<<<<< HEAD
 from sqlalchemy import create_engine, text
+=======
+from sqlalchemy import create_engine
+>>>>>>> 7ccb08bcab1b3dcedf665b976f4e848d497cafab
 
 # Load environment variables
 POSTGRES_URL = f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'postgres')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'ecommerce')}"
@@ -16,8 +20,9 @@ pg_engine = create_engine(POSTGRES_URL)
 # Fetch all tables from SQLite
 query = "SELECT name FROM sqlite_master WHERE type='table';"
 tables = pd.read_sql(query, sqlite_connector)["name"].tolist()
-
+#table_order = ["customers", "orders", "order_items", "order_payments", "order_reviews", "fraud_alerts"]
 LIMIT_NUM = 100000
+
 # Store all tables in PostgreSQL
 for table in tables:
     try:

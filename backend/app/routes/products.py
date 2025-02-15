@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from app.models.database import get_db, postgres_engine
 from sqlalchemy import MetaData, Table, select, func
+
 
 router = APIRouter()
 

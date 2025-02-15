@@ -169,4 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+<<<<<<< HEAD
 data_pipeline/data/olist.sqlite
+=======
+>>>>>>> 7ccb08bcab1b3dcedf665b976f4e848d497cafab
