@@ -1,12 +1,7 @@
 import os
 import sqlite3
 import pandas as pd
-<<<<<<< HEAD
 from sqlalchemy import create_engine, text
-=======
-from sqlalchemy import create_engine
->>>>>>> 7ccb08bcab1b3dcedf665b976f4e848d497cafab
-
 # Load environment variables
 POSTGRES_URL = f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'postgres')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'ecommerce')}"
 SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "/app/data/olist.sqlite")
