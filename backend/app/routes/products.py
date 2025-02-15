@@ -17,4 +17,5 @@ def get_products():
     with postgres_engine.connect() as conn:
         results = conn.execute(stmt).fetchall()
         products_list = [{"product_id": row[0], "product_category_name": row[1], "price": row[3]} for row in results]
+        print("generate products_list successfully")
     return products_list

@@ -1,11 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.models.database import get_db, postgres_engine
-<<<<<<< HEAD
 from sqlalchemy import Table, MetaData, select
-=======
-from sqlalchemy import Table, MetaData
->>>>>>> 7ccb08bcab1b3dcedf665b976f4e848d497cafab
 
 router = APIRouter()
 
@@ -19,7 +15,6 @@ def register_user(request: RegisterRequest):
     metadata = MetaData()
     customers = Table('customers', metadata, autoload_with=postgres_engine)
     with postgres_engine.connect() as conn:
-<<<<<<< HEAD
         stmt = select(customers).where(customers.c.customer_id == request.customer_id)
         result = conn.execute(stmt).fetchone()
 
@@ -31,12 +26,7 @@ def register_user(request: RegisterRequest):
             conn.commit()
             print(f"customer_id: {request.customer_id} and customer_unique_id: {request.username} is inserted successfully.")
         return {"success": True, "customer_id": request.customer_id}
-=======
-        insert_stmt = customers.insert().values(customer_id=request.customer_id, customer_unique_id=request.username)
-        conn.execute(insert_stmt)
-        conn.commit()
-    return {"success": True, "customer_id": request.customer_id}
->>>>>>> 7ccb08bcab1b3dcedf665b976f4e848d497cafab
+
 
 class LoginRequest(BaseModel):
     username: str
