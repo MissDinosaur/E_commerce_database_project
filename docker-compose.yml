@@ -7,6 +7,7 @@ services:
       context: ./databases/postgres
       dockerfile: Dockerfile
     container_name: postgres
+    restart: always  # Ensures database doesn't crash
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -18,6 +19,11 @@ services:
       - ./databases/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 2️⃣ Start MongoDB
   mongo_db:
@@ -25,6 +31,7 @@ services:
       context: ./databases/mongo
       dockerfile: Dockerfile
     container_name: mongo_db
+    restart: always  # Ensures database doesn't crash
     ports:
       - "27017:27017"
     volumes:
@@ -32,6 +39,11 @@ services:
       - ./databases/mongo/init.js:/docker-entrypoint-initdb.d/init.js
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 3️⃣ Start Neo4j
   neo4j_db:
@@ -39,6 +51,7 @@ services:
       context: ./databases/neo4j
       dockerfile: Dockerfile
     container_name: neo4j_db
+    restart: always
     environment:
       - NEO4J_AUTH=neo4j/password
     ports:
@@ -49,6 +62,11 @@ services:
       - ./databases/neo4j/init.cypher:/var/lib/neo4j/import/init.cypher
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "MATCH () RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 4️⃣ Run Data Ingestion (after databases are up)
   data_ingestion:
@@ -56,6 +74,7 @@ services:
       context: ./data_pipeline
       dockerfile: Dockerfile
     container_name: data_ingestion
+    restart: on-failure
     volumes:
       - ./data_pipeline:/app
       - ./data_pipeline/data/olist.sqlite:/app/data/olist.sqlite
@@ -65,9 +84,12 @@ services:
            python ingestion/mongo_ingest.py &&
            python ingestion/neo4j_ingest.py"
     depends_on:
-      - postgres_db
-      - mongo_db
-      - neo4j_db
+      postgres_db:
+        condition: service_healthy
+      mongo_db:
+        condition: service_healthy
+      neo4j_db:
+        condition: service_healthy
     networks:
       - app_network
 
@@ -77,11 +99,13 @@ services:
       context: ./data_pipeline
       dockerfile: Dockerfile
     container_name: model_training
+    restart: on-failure
     volumes:
       - ./data_pipeline:/app
     command: python ml/train_model.py
     depends_on:
-      - data_ingestion
+      data_ingestion:
+        condition: service_completed_successfully
     networks:
       - app_network
 
@@ -91,6 +115,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend
+    restart: on-failure
     ports:
       - "8000:8000"
     environment:
@@ -101,18 +126,23 @@ services:
       - ./data_pipeline/ml/predict.py:/app/predict.py  # ✅ Mount predict.py
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
     depends_on:
-      - model_training  # ✅ Backend waits for training
+      model_training:
+        condition: service_completed_successfully  # ✅ Backend waits for training
     networks:
       - app_network
 
-  # 7️⃣ Frontend (Optional)
+  # 7️⃣ Start Frontend (after backend is up)
   frontend:
     container_name: frontend
     image: nginx:alpine
+    restart: on-failure
     volumes:
       - ./frontend:/usr/share/nginx/html
     ports:
       - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy  # ✅ Frontend waits for backend
     networks:
       - app_network
 
@@ -154,10 +184,10 @@ services:
 
 # 🔄 Persistent Storage Volumes
 volumes:
-  backend_data:
   postgres_data:
   mongo_data:
   neo4j_data:
+  backend_data:
   data_pipeline_data:
   frontend_data:
   logs_data:

@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from neo4j import GraphDatabase
 
 # Load Fraud Model
-model = joblib.load("app/ml/fraud_model.pkl")  # "should be ml/fraud_model.pkl" or /app/ml/fraud_model.pkl
+model = joblib.load("/app/ml/fraud_model.pkl")  # "should be ml/fraud_model.pkl" or /app/ml/fraud_model.pkl
 
 # Connect to PostgreSQL
 POSTGRES_URL = "postgresql://postgres:password@postgres_db/ecommerce"
