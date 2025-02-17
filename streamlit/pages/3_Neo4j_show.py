@@ -29,15 +29,23 @@ def check_data(table_option, size):
     
     results = query_neo4j(query)
     st.dataframe(results, use_container_width=True)
-    
+
+def get_node_count(label: str):
+    query = f"MATCH (n:{label}) RETURN count(n) AS count"
+    with driver.session() as session:
+        result = session.run(query)
+        count = result.single()["count"]
+    return count
 
 if __name__ == "__main__":  
     st.write("# Welcme to Neo4J")
 
     table_option = st.selectbox("Which table you wanna check?", ("Customer", "Order", "Payment"))
-    size = st.slider("How old are you?", 1, 100, 10)
+    size = st.slider("How many rows you wanna check?", 1, 100, 10)
     st.write("You selected:", table_option) 
 
     check_button = st.button("Check", type="primary")
     if check_button:
+        node_count = get_node_count(table_option)
+        st.write(f"Label {table_option} has {node_count} nodes.")
         check_data(table_option, size)
