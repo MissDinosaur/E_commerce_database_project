@@ -49,7 +49,7 @@ if __name__ == "__main__":
     #st.write("All the collections in the 'ecommerce' DB")
     #show_mongodb_all_tables()
 
-    st.write("* Check data")
+    st.write("* **Check data**")
     db_option = st.selectbox("Which DB you wanna check?", tuple(created_db_names))
     collection_option = st.selectbox("Which collection you wanna check?", tuple(mongo_client[db_option].list_collection_names()))
     

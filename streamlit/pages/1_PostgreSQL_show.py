@@ -65,11 +65,11 @@ def check_data(table_option, columns_option, size: int, filter):
 
 if __name__ == "__main__":   
     st.write("# Welcme to PostgreSQL")
-    st.write("Table summary")
+    st.write("* **Table summary**")
     show_postgres_tables(tables_names)
 
 
-    st.write("Check data")
+    st.write("* **Check data**")
     col1, col2 = st.columns(2)
     with col1:
         table_option = st.selectbox("Select table", tuple(tables_names))

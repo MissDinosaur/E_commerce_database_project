@@ -40,6 +40,7 @@ def get_node_count(label: str):
 if __name__ == "__main__":  
     st.write("# Welcme to Neo4J")
 
+    st.write("* **Check data**")
     table_option = st.selectbox("Which table you wanna check?", ("Customer", "Order", "Payment"))
     size = st.slider("How many rows you wanna check?", 1, 100, 10)
     st.write("You selected:", table_option) 
