@@ -80,6 +80,7 @@ services:
       - ./data_pipeline/data/olist.sqlite:/app/data/olist.sqlite
     command: >
       sh -c "sleep 10 &&
+           pip install tqdm &&
            python ingestion/postgres_ingest.py &&
            python ingestion/mongo_ingest.py &&
            python ingestion/neo4j_ingest.py"
