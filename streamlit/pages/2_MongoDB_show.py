@@ -22,6 +22,8 @@ def show_mongodb_all_tables():
 def check_data(db_name, collection_name, size, query_filter, projection):
     db = mongo_client[db_name]
     collection = db[collection_name]
+    count = collection.count_documents({})
+    st.write(f"Collection {collection_name} has {count} documents.")
     #documents  = list(collection.find({}, limit=size))
     documents = None
     print(f"query_filter {query_filter}, projection: {projection}")
