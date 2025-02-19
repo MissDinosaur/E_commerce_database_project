@@ -110,91 +110,91 @@ services:
     networks:
       - app_network
 
-  # 6️⃣ Start Backend (after model training is done)
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend
-    restart: on-failure
-    ports:
-      - "8000:8000"
-    environment:
-      - PYTHONUNBUFFERED=1
-    volumes:
-      - ./backend:/app
-      - ./data_pipeline/ml/fraud_model.pkl:/app/ml/fraud_model.pkl  # ✅ Mount trained model
-      - ./data_pipeline/ml/predict.py:/app/predict.py  # ✅ Mount predict.py
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
-    depends_on:
-      model_training:
-        condition: service_completed_successfully  # ✅ Backend waits for training
-    networks:
-      - app_network
+  # # 6️⃣ Start Backend (after model training is done)
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: backend
+  #   restart: on-failure
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #   volumes:
+  #     - ./backend:/app
+  #     - ./data_pipeline/ml/fraud_model.pkl:/app/ml/fraud_model.pkl  # ✅ Mount trained model
+  #     - ./data_pipeline/ml/predict.py:/app/predict.py  # ✅ Mount predict.py
+  #   command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
+  #   depends_on:
+  #     model_training:
+  #       condition: service_completed_successfully  # ✅ Backend waits for training
+  #   networks:
+  #     - app_network
 
-  # 7️⃣ Start Frontend (after backend is up)
-  frontend:
-    container_name: frontend
-    image: nginx:alpine
-    restart: on-failure
-    volumes:
-      - ./frontend:/usr/share/nginx/html
-    ports:
-      - "80:80"
-    depends_on:
-      backend:
-        condition: service_healthy  # ✅ Frontend waits for backend
-    networks:
-      - app_network
+  # # 7️⃣ Start Frontend (after backend is up)
+  # frontend:
+  #   container_name: frontend
+  #   image: nginx:alpine
+  #   restart: on-failure
+  #   volumes:
+  #     - ./frontend:/usr/share/nginx/html
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     backend:
+  #       condition: service_healthy  # ✅ Frontend waits for backend
+  #   networks:
+  #     - app_network
 
-  # 8️⃣ Logging Service
-  logs:
-    container_name: logs
-    image: python:3.11
-    volumes:
-      - ./logs:/logs
-    networks:
-      - app_network
+  # # 8️⃣ Logging Service
+  # logs:
+  #   container_name: logs
+  #   image: python:3.11
+  #   volumes:
+  #     - ./logs:/logs
+  #   networks:
+  #     - app_network
 
-  # 9️⃣ Scripts Container
-  scripts:
-    container_name: scripts
-    image: python:3.11
-    volumes:
-      - ./scripts:/scripts
-    networks:
-      - app_network
+  # # 9️⃣ Scripts Container
+  # scripts:
+  #   container_name: scripts
+  #   image: python:3.11
+  #   volumes:
+  #     - ./scripts:/scripts
+  #   networks:
+  #     - app_network
 
-  # 🔟 Testing Container
-  tests:
-    container_name: tests
-    image: python:3.11
-    volumes:
-      - ./tests:/tests
-    networks:
-      - app_network
+  # # 🔟 Testing Container
+  # tests:
+  #   container_name: tests
+  #   image: python:3.11
+  #   volumes:
+  #     - ./tests:/tests
+  #   networks:
+  #     - app_network
 
-  # 1️⃣1️⃣ Temporary Storage
-  tmp:
-    container_name: tmp
-    image: python:3.11
-    volumes:
-      - ./tmp:/tmp
-    networks:
-      - app_network
+  # # 1️⃣1️⃣ Temporary Storage
+  # tmp:
+  #   container_name: tmp
+  #   image: python:3.11
+  #   volumes:
+  #     - ./tmp:/tmp
+  #   networks:
+  #     - app_network
 
 # 🔄 Persistent Storage Volumes
 volumes:
   postgres_data:
   mongo_data:
   neo4j_data:
-  backend_data:
   data_pipeline_data:
-  frontend_data:
-  logs_data:
-  scripts_data:
-  tests_data:
-  tmp_data:
+  # backend_data:
+  # frontend_data:
+  # logs_data:
+  # scripts_data:
+  # tests_data:
+  # tmp_data:
 
 # 🔗 Network Configuration
 networks:
