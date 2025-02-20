@@ -1,0 +1,59 @@
+fraud_detection_project/
+│── docker-compose.yml           # Multi-container deployment for DBs, API, ML model
+│── .env                         # Environment variables
+│── README.md                    # Project documentation
+│
+├── frontend/                    # Simple HTML frontend
+│   ├── registration.html        # User registration page
+│   ├── login.html               # User login page
+│   ├── home.html                # Home page with 2 products
+│   ├── checkout.html            # Checkout page tracking cursor movement
+│   ├── styles.css               # Basic styles
+│
+├── backend/                     # Fraud detection API using FastAPI
+│   ├── app/
+│   │   ├── templates/           # Serving frontend pages with FastAPI
+│   │   ├── static/              # Static CSS/JS files
+│   │   ├── models/              # Database models
+│   │   ├── routes/              # API endpoints (login, checkout, fraud detection)
+│   │   ├── services/            # Business logic for fraud detection
+│   │   ├── main.py              # FastAPI entry point
+│   ├── requirements.txt         # Python dependencies
+│   ├── Dockerfile               # Dockerfile for backend
+│
+├── data_pipeline/               # Data ingestion, processing, fraud detection
+│   ├── ingestion/               # Ingesting data into different databases
+│   │   ├── postgres_ingest.py   # Ingest transactions into PostgreSQL
+│   │   ├── mongo_ingest.py      # Store logs in MongoDB
+│   │   ├── neo4j_ingest.py      # Store cursor logs in Neo4j
+│   ├── processing/              # Data transformation
+│   │   ├── transform.py         # Clean and preprocess data
+│   ├── ml/                      # Machine Learning fraud detection
+│   │   ├── fraud_detection.py   # Fraud detection pipeline (your updated script)
+│   │   ├── train_model.py       # Training fraud detection model
+│   │   ├── predict.py           # Making fraud predictions
+│   │   ├── fraud_model.pkl      # Saved trained model
+│   ├── visualization/           # Fraud detection graphs and analysis
+│   │   ├── generate_graphs.py   # Generate fraud metrics and visualizations
+│   ├── Dockerfile               # Dockerfile for data pipeline
+│
+├── databases/                   # Database setups for logs and transactions
+│   ├── postgres/                # PostgreSQL setup for fraud alerts
+│   │   ├── init.sql             # Database initialization
+│   ├── mongo/                   # MongoDB setup for cursor logs
+│   │   ├── init.js              # MongoDB initialization
+│   ├── neo4j/                   # Neo4j setup for cursor tracking
+│   │   ├── init.cypher          # Neo4j initialization
+│   ├── Dockerfile               # Dockerfile for databases
+│
+├── logs/                        # Real-time log storage
+│   ├── store_logs_neo4j.py      # Stores cursor tracking in Neo4j
+│   ├── store_logs_postgres.py   # Stores fraud alerts in PostgreSQL
+│
+├── scripts/                     # Utility scripts
+│   ├── setup.py                 # Setup and initialization script
+│   ├── test_api.py              # API testing script
+│
+└── tests/                       # Automated tests
+    ├── test_ml.py               # Testing ML model
+    ├── test_api.py              # Testing API endpoints
