@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        async function handleCheckout(event) {
+            event.preventDefault(); // Prevent default form submission
+            
+            const customerId = document.getElementById("customer_id").value;
+            const productId = document.getElementById("product_id").value;
+            const orderId = "ORD-" + Math.floor(Math.random() * 100000); // Generate random order ID
+
+            const response = await fetch("/api/checkout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ customer_id: customerId, product_id: productId, order_id: orderId })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById("message").innerHTML = `
+                    <p class="success">✅ Purchase successful! (Fraud Score: ${result.fraud_score.toFixed(2)})</p>
+                `;
+            } else {
+                document.getElementById("message").innerHTML = `
+                    <p class="warning">⚠️ Transaction logged but marked as fraud! (Fraud Score: ${result.fraud_score.toFixed(2)})</p>
+                `;
+            }
+        }
+        let eventLogs = [];  // Store logs in memory
+    const LOG_BATCH_SIZE = 10;  // Adjust based on need
+
+    function logEvent(eventType, data) {
+        eventLogs.push({ event: eventType, ...data, timestamp: new Date().toISOString() });
+
+        // Send logs in batches
+        if (eventLogs.length >= LOG_BATCH_SIZE) {
+            sendLogs();
+        }
+    }
+
+    function sendLogs() {
+        if (eventLogs.length === 0) return; // Nothing to send
+
+        fetch("/api/logs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(eventLogs)
+        }).then(() => {
+            eventLogs = [];  // Clear sent logs
+        }).catch(err => console.error("Log Error:", err));
+    }
+
+    document.addEventListener("mousemove", (event) => {
+        logEvent("mousemove", { x: event.clientX, y: event.clientY });
+    });
+
+    document.addEventListener("click", (event) => {
+        logEvent("click", { x: event.clientX, y: event.clientY, target: event.target.tagName });
+    });
+
+    document.addEventListener("scroll", () => {
+        logEvent("scroll", { scrollY: window.scrollY });
+    });
+
+    window.addEventListener("beforeunload", sendLogs); // Ensure logs are sent before page exit
+    </script>
+</head>
+<body>
+    <div class="checkout-container">
+        <h1>Checkout</h1>
+        <form onsubmit="handleCheckout(event)">
+            <label for="customer_id">Customer ID:</label>
+            <input type="text" id="customer_id" required>
+
+            <label for="product_id">Product ID:</label>
+            <input type="text" id="product_id" required>
+
+            <button type="submit">Complete Purchase</button>
+        </form>
+        <div id="message"></div>
+    </div>
+</body>
+</html>
