@@ -122,3 +122,10 @@ CREATE TABLE IF NOT EXISTS fraud_alerts (
     alert_flag BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Orders_stream Table
+CREATE TABLE IF NOT EXISTS orders_stream (
+    order_id TEXT,
+    customer_id TEXT,
+    product_id TEXT
+);

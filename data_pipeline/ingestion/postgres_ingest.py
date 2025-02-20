@@ -14,33 +14,38 @@ def postgres():
     # Connect to PostgreSQL
     pg_engine = create_engine(POSTGRES_URL)
 
-    # Fetch all tables from SQLite
-    #query = "SELECT name FROM sqlite_master WHERE type='table';"
-    #sqlite_tables = pd.read_sql(query, sqlite_connector)["name"].tolist()
-    ordered_tables = ['order_items', 'order_payments', 'order_reviews', 'orders', 'customers', 'geolocation', 'products', 'product_category_name_translation', 'sellers', 'leads_qualified', 'leads_closed']
+    # All tables from SQLite
+    ordered_tables = ['order_items', 'order_payments', 'order_reviews', 'orders', 'customers', 
+                      'geolocation', 'products', 'product_category_name_translation', 'sellers', 
+                      'leads_qualified', 'leads_closed']
 
-    LIMIT_NUM = 100000
-
+    # empty table but not destroy the table structure before insert data 
     for table in ordered_tables:
         with pg_engine.connect() as conn:
-            # empty table but not destroy the table structure before insert data 
             conn.execute(text(f"DELETE FROM {table};"))
             conn.commit()
     print("All table are cleared for the data ingestion.")
 
+    # distinct exisiting customer_id in customers
     existing_customer_ids = pd.read_sql(f"SELECT customer_id FROM customers", con=sqlite_connector)['customer_id'].tolist()
+    # distinct exisiting order_id in orders
     existing_order_ids = pd.read_sql("SELECT order_id FROM orders", con=sqlite_connector)['order_id'].tolist()
+    
+    # tables that have REFERENCES with orders
     orders_tables_names = ["order_items", "order_payments", "order_reviews"]
-    other_table_names = ['product_category_name_translation', 'sellers', 'geolocation', 'products', 'leads_qualified', 'leads_closed']
+    # tables that have no REFERENCES
+    other_table_names = ['product_category_name_translation', 'sellers', 
+                         'geolocation', 'products', 'leads_qualified', 'leads_closed']
 
     customers_df = pd.read_sql(f"SELECT * FROM customers", con=sqlite_connector)
     orders_df = pd.read_sql(f"SELECT * FROM orders", con=sqlite_connector)
 
+    # Store custoners into Postgres
     customers_df.to_sql("customers", pg_engine, if_exists="append", index=False)
     print(f"New data is inserted into PostgreSQL table: customers.")
 
-    # Store orders and it has REFERENCES with customers in PostgreSQL
-    orders_df[orders_df['order_id'].isin(existing_order_ids)].to_sql("orders", pg_engine, if_exists="append", index=False)
+    # Store orders into PostgreSQL. Store has REFERENCES with customers: customer_id
+    orders_df[orders_df['customer_id'].isin(existing_customer_ids)].to_sql("orders", pg_engine, if_exists="append", index=False)
     print(f"New data is inserted into PostgreSQL table: orders.")
 
     # Store tables having REFERENCES with orders in PostgreSQL
