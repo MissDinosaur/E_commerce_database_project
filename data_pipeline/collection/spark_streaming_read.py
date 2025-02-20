@@ -65,14 +65,6 @@ def parse_streaming_data(binary_df):
     return orders_parsed_df
 
 
-"""
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1,org.postgresql:postgresql:42.5.0 kafka_to_streaming.py --master spark://spark-master:7077
-"""
-
-"""
-spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1,org.postgresql:postgresql:42.5.0 kafka_to_streaming.py
-"""
-
 if __name__ == "__main__":
     print("Kafka and Spark streaming")
 
