@@ -172,6 +172,13 @@ def plot_correlation_heatmap(X):
     plt.tight_layout()
     plt.savefig(f'{output_dir}feature_correlation_heatmap.png')
     plt.close()
+    
+def save_best_model(results, models):
+    best_model_name = max(results, key=lambda x: results[x]["R2"])
+    best_model = models[best_model_name]
+    path = f"/app/ml/{best_model_name.replace(' ', '_').lower()}_model.pkl"
+    joblib.dump(best_model, path)
+    return path, best_model_name, results[best_model_name]
 
 def main():
     # Get transformed data
@@ -222,6 +229,8 @@ def main():
         # Plot feature importance for tree-based models
         if model_name in ["Random Forest", "Gradient Boosting"]:
             plot_feature_importance(model, feature_names=X.columns, model_name=model_name)
+            
+        save_best_model(results, models)
     
     # Plot model performance
     plot_model_performance(results)

@@ -49,10 +49,10 @@ def ingest_data():
         with pg_conn, pg_conn.cursor(cursor_factory=DictCursor) as pg_cursor, neo4j_driver.session() as session:
             # PostgreSQL data fetching and ingestion to Neo4j
             queries = {
-                "customers": "SELECT customer_id, customer_unique_id, customer_zip_code_prefix, customer_city, customer_state FROM customers limit 2",
-                "orders": "SELECT order_id, customer_id, order_status, order_purchase_timestamp FROM orders limit 2",
-                "payments": "SELECT order_id, payment_type, payment_installments, payment_value FROM order_payments limit 2",
-                "fraud_alerts": "SELECT customer_id, fraud_score FROM fraud_alerts WHERE fraud_score IS NOT NULL limit 2"
+                "customers": "SELECT customer_id, customer_unique_id, customer_zip_code_prefix, customer_city, customer_state FROM customers limit 2000",
+                "orders": "SELECT order_id, customer_id, order_status, order_purchase_timestamp FROM orders limit 2000",
+                "payments": "SELECT order_id, payment_type, payment_installments, payment_value FROM order_payments limit 2000",
+                "fraud_alerts": "SELECT customer_id, fraud_score FROM fraud_alerts WHERE fraud_score IS NOT NULL limit 2000"
             }
 
             for table, query in queries.items():

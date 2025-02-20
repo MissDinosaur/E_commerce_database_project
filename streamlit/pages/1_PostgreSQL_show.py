@@ -3,8 +3,8 @@ from sqlalchemy import create_engine, Table, MetaData, select, func
 from sqlalchemy.engine import reflection
 import streamlit as st
 import os
-
-POSTGRES_URL = f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'ecommerce')}"
+POSTGRES_URL = "postgresql://postgres:password@localhost:5432/ecommerce"
+#POSTGRES_URL = f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'postgres')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'ecommerce')}"
 
 
 print(POSTGRES_URL)
@@ -57,6 +57,7 @@ def show_postgres_tables(table_names: str):
     st.write("How many rows do they have seperately:")  
     st.dataframe(count_df)  
 
+@st.cache_data(ttl=0)
 def check_data(table_option, columns_option, size: int, filter):
     query = ""
     if "All" in columns_option:
