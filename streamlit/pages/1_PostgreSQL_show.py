@@ -78,6 +78,8 @@ if __name__ == "__main__":
     with col1:
         table_option = st.selectbox("Select table", tuple(table_names))
         columns_option = st.multiselect("Select columns", ("All", ) + tuple(get_all_columns(table_option).keys()))
+        if columns_option is None or columns_option==[]:
+            columns_option = "All" 
     with col2:
         st.write("Filter condition")
         column = st.selectbox("Column", tuple(get_all_columns(table_option).keys()))
@@ -88,7 +90,7 @@ if __name__ == "__main__":
     if all(x is not None and x != "" for x in (column, logic, value)):
         filter_condition = f"WHERE {column} {logic} '{value}'"   
         st.write(f"SELECT {columns_option} FROM {table_option} {filter_condition}")
-    else:
+    else:  
         st.write(f"SELECT {columns_option} FROM {table_option}")
     
 
