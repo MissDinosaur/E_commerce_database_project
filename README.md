@@ -14,7 +14,7 @@ In addition, for data collection part, the usage of Kafka + Spark streaming, you
 
 Apart from that, this project has made a Data-checking website in Streamlit. In this website, yoiu can easily check the tables of PostgreSQL, MongDB and Neo4J. But you also need trigger it manually by one comand given as below.
 
-Last, this project is containerized. All the services are containeraized by docker.
+Last, this project is containerized. All the services are containeraized by docker. There will be 12 images and 16 containers generated after triggering project.
 
 ## Technologies Used
 
