@@ -18,7 +18,7 @@ This project aims to analyze e-commerce transactions from the Olist dataset to d
 ### Prerequisites
 
 - Docker
-- Python 3.10
+- Python 3.11
 - Access to a Kafka server (can be local or remote)
 
 ### Setup
